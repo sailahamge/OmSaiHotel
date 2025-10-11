@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OM SAI HOTEL — Book Rooms, View Photos, Amenities, Location</title>
+<style>
+  :root{
+    --brand:#2a6f4e;         /* deep green like travel sites */
+    --brand-2:#1a4a34;
+    --accent:#ff8c00;        /* warm accent */
+    --bg:#f6f7f8;
+    --text:#1d1f23;
+    --muted:#6b7280;
+    --card:#ffffff;
+    --star:#ffb400;
+    --ring: rgba(42,111,78,.25);
+  }
+  /* reset */
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  a{color:var(--brand);text-decoration:none}
+  img{display:block;max-width:100%}
+
+  /* top bar */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:var(--card);border-bottom:1px solid #e5e7eb;
+  }
+  .topbar-inner{max-width:1100px;margin:auto;display:flex;align-items:center;gap:16px;padding:10px 16px}
+  .logo{
+    font-weight:800;letter-spacing:.4px;display:flex;align-items:center;gap:10px;
+    color:var(--brand-2)
+  }
+  .logo .runner{
+    font-weight:900; overflow:hidden; white-space:nowrap; width:190px;
+    position:relative; height:20px; line-height:20px;
+  }
+  .runner span{
+    position:absolute; animation:marquee 8s linear infinite; left:100%;
+  }
+  @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-220%)} }
+
+  .spacer{flex:1}
+  .menu{display:flex;gap:16px;align-items:center}
+  .btn{
+    padding:10px 14px;border-radius:999px;border:1px solid #d1d5db;background:#fff;color:#111;
+    font-weight:600;transition:.2s; cursor:pointer
+  }
+  .btn:hover{border-color:var(--brand);box-shadow:0 0 0 4px var(--ring)}
+  .btn-primary{
+    background:var(--brand);color:#fff;border-color:var(--brand)
+  }
+  .btn-primary:hover{background:var(--brand-2);border-color:var(--brand-2)}
+
+  /* header block */
+  .header{
+    max-width:1100px;margin:16px auto 0;display:grid;grid-template-columns:2.1fr 1fr;gap:16px;padding:0 16px;
+  }
+  .hero{
+    background:#000;border-radius:14px;overflow:hidden; position:relative
+  }
+  .hero img{width:100%;height:360px;object-fit:cover}
+  .hero .dots{
+    position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:6px;
+  }
+  .dot{width:10px;height:10px;border-radius:50%;background:#ffffffa8;border:1px solid #fff;cursor:pointer}
+  .dot.active{background:#fff}
+
+  .thumbs{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;height:360px
+  }
+  .thumbs img{height:175px;object-fit:cover;border-radius:12px;cursor:pointer}
+  .thumbs img:last-child{grid-column:1/-1;height:175px}
+
+  /* title and rating row */
+  .titlebar{
+    max-width:1100px;margin:14px auto 0;display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:0 16px;
+  }
+  .hotel-name{font-size:26px;font-weight:800;letter-spacing:.2px}
+  .rating{display:flex;align-items:center;gap:8px;color:var(--muted)}
+  .stars{display:inline-flex;gap:2px}
+  .star{width:18px;height:18px;fill:var(--star)}
+
+  /* tabs */
+  .tabs{
+    max-width:1100px;margin:16px auto;padding:0 16px
+  }
+  .tablist{
+    display:flex;gap:8px; flex-wrap:wrap;
+    background:var(--card);border:1px solid #e5e7eb;border-radius:12px;padding:6px
+  }
+  .tab{
+    padding:10px 14px;border-radius:10px;font-weight:600;color:var(--muted);cursor:pointer
+  }
+  .tab.active{background:var(--brand);color:#fff}
+  .panel{margin-top:12px}
+
+  .grid{display:grid;gap:16px}
+  .grid-2{grid-template-columns:2fr 1fr}
+  .card{background:var(--card);border:1px solid #e5e7eb;border-radius:14px; padding:16px}
+
+  /* room cards */
+  .rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+  .room-card{border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+  .room-card img{height:150px;object-fit:cover}
+  .room-body{padding:12px}
+  .price{font-weight:800;color:var(--brand-2);font-size:18px}
+  .badge{display:inline-block;background:#eef6f1;color:var(--brand-2);padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
+
+  /* amenities */
+  .amen-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+  .amen{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#fafafa}
+
+ 
+  /* sidebar booking panel */
+  .side{position:sticky; top:76px; display:grid; gap:16px}
+  .side .card h3{margin:0 0 8px}
+
+  /* simple form */
+  .form .row{display:grid;gap:10px}
+  .form input,.form textarea,.form select{
+    width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;background:#fff
+  }
+  .form textarea{min-height:86px;resize:vertical}
+
+  /* location iframe */
+  .map{border:0;width:100%;height:320px;border-radius:12px}
+
+  footer{margin-top:28px;background:#0f172a;color:#e5e7eb}
+  .foot-inner{max-width:1100px;margin:auto;padding:18px 16px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .tiny{color:#94a3b8;font-size:12px}
+
+  /* responsive */
+  @media (max-width: 960px){
+    .header{grid-template-columns:1fr}
+    .thumbs{grid-template-columns:1fr 1fr;height:auto}
+    .side{position:static}
+    .grid-2{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- Sticky top bar -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+        <path d="M7 13l3 3 7-7" stroke="currentColor" stroke-width="2" fill="none"/>
+      </svg>
+      <div class="runner"><span>OM SAI HOTEL • OM SAI HOTEL • OM SAI HOTEL •</span></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="menu">
+      <a class="btn" href="#booking">Booking</a>
+      <a class="btn" href="#contact">Contact</a>
+      <a class="btn" href="#address">Address</a>
+      <button class="btn btn-primary" onclick="document.getElementById('booking').scrollIntoView({behavior:'smooth'})">Book Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- Header media (hero + thumbs) -->
+<section class="header">
+  <div class="hero" id="hero">
+    <img id="heroImg" src="/Photos/HotelPhoto.jpg" alt="OM SAI HOTEL - Lobby">
+    <div class="dots" id="dots"></div>
+  </div>
+  <div class="thumbs" id="thumbs">
+    <img src="/Photos/Room1.jpg" alt="Room 1" >
+    <img src="/Photos/Room2.jpg" alt="Room 2" >
+    <img src="/Photos/Room2.jpg" alt="Room 3" >
+  </div>
+</section>
+
+<!-- Title + rating row -->
+<section class="titlebar">
+  <div class="hotel-name">OM SAI HOTEL</div>
+  <div class="rating">
+    <div class="stars" aria-label="4.5 out of 5">
+      <!-- 4 full stars + half -->
+      <svg class="star" viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.28 5.83.85-4.22 4.1.99 5.78L10 15.9l-5.2 2.61.99-5.78L1.58 7.63l5.83-.85L10 1.5z"/></svg>
+      <svg class="star" viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.28 5.83.85-4.22 4.1.99 5.78L10 15.9l-5.2 2.61.99-5.78L1.58 7.63l5.83-.85L10 1.5z"/></svg>
+      <svg class="star" viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.28 5.83.85-4.22 4.1.99 5.78L10 15.9l-5.2 2.61.99-5.78L1.58 7.63l5.83-.85L10 1.5z"/></svg>
+      <svg class="star" viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.28 5.83.85-4.22 4.1.99 5.78L10 15.9l-5.2 2.61.99-5.78L1.58 7.63l5.83-.85L10 1.5z"/></svg>
+      <svg class="star" viewBox="0 0 20 20"><defs><linearGradient id="half"><stop offset="50%" stop-color="var(--star)"/><stop offset="50%" stop-color="#e5e7eb"/></linearGradient></defs><path fill="url(#half)" d="M10 1.5l2.6 5.28 5.83.85-4.22 4.1.99 5.78L10 15.9l-5.2 2.61.99-5.78L1.58 7.63l5.83-.85L10 1.5z"/></svg>
+    </div>
+    <span>4.5/5 • Guests love cleanliness & location</span>
+  </div>
+</section>
+
+<!-- Tabs -->
+<section class="tabs">
+  <div class="tablist" id="tablist" role="tablist" aria-label="Sections">
+    <button class="tab active" data-tab="overview" role="tab" aria-selected="true">Overview</button>
+    <button class="tab" data-tab="rooms" role="tab">Rooms & Prices</button>
+    <button class="tab" data-tab="amenities" role="tab">Amenities</button>
+    <button class="tab" data-tab="reviews" role="tab">Reviews</button>
+    <button class="tab" data-tab="location" role="tab">Location</button>
+  </div>
+
+  <!-- Overview -->
+  <div class="panel" id="panel-overview">
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Why stay at OM SAI HOTEL?</h3>
+        <p>Experience comfort, cleanliness, and convenience near the city center. Perfect for families, business travelers, and pilgrims.</p>
+        <ul>
+          <li>Prime location • Easy access to transport</li>
+          <li>AC & Non-AC rooms • Daily housekeeping</li>
+          <li>In-house dining • 24x7 front desk</li>
+        </ul>
+      </div>
+      <aside class="side">
+        <div class="card" id="booking">
+          <h3>Book your stay</h3>
+          <form class="form" onsubmit="submitBooking(event)">
+            <div class="row">
+              <input required name="name" placeholder="Full Name" />
+              <input required name="phone" placeholder="Phone Number" />
+              <input required name="aadhaar" placeholder="Aadhaar Card Number" />
+              <input required name="address" placeholder="Address" />
+              <select required name="room">
+                <option value="">Select Room</option>
+                <option>Room 101 — ₹1900/day/night</option>
+                <option>Room 102 — ₹2500/day/night</option>
+		<option>Room 103 — ₹3000/day/night</option>
+                <option>Room 104 — ₹3500/day/night</option>
+		<option>Room 201 — ₹1900/day/night</option>
+                <option>Room 202 — ₹2500/day/night</option>
+		<option>Room 203 — ₹3000/day/night</option>
+                <option>Room 204 — ₹3500/day/night</option>
+		<option>Room 301 — ₹1900/day/night</option>
+                <option>Room 302 — ₹2500/day/night</option>
+		<option>Room 303 — ₹3000/day/night</option>
+                <option>Room 304 — ₹3500/day/night</option>
+
+              </select>
+              <select required name="payment">
+                <option value="">Payment Method</option>
+                <option>Cash</option>
+                <option>UPI</option>
+                <option>Credit/Debit Card</option>
+              </select>
+              <button class="btn btn-primary" type="submit">Confirm Booking</button>
+            </div>
+            <p class="tiny">Your details are stored only in this browser for demo.</p>
+          </form>
+        </div>
+        <div class="card" id="contact">
+          <h3>Contact</h3>
+          <p><strong>Name:</strong> Om Gondkar</p>
+          <p><strong>Phone:</strong> <a href="tel:8855099414">8855099414</a></p>
+          <p><strong>Email:</strong> <a href="mailto:hotelomsai11@gamil.com">hotelomsai11@gamil.com</a></p>
+        </div>
+        <div class="card" id="address">
+          <h3>Address</h3>
+          <p>OM SAI HOTEL, Near City Center, Shirdi, Maharashtra, India</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Rooms & Prices -->
+  <div class="panel" id="panel-rooms" hidden>
+    <div class="rooms">
+      <div class="room-card">
+        <img src="/Photos/Room1.jpg" alt="Room 101">
+        <div class="room-body">
+          <div class="badge">Room 101</div>
+          <h4>Standard AC</h4>
+          <p class="price">₹1900 / night</p>
+          <ul class="tiny">
+            <li>Queen bed • 2 guests</li>
+            <li>Attached washroom</li>
+          </ul>
+          <button class="btn" onclick="quickBook('Room 101 — ₹1900')">Book this</button>
+        </div>
+      </div>
+      <div class="room-card">
+        <img src="/Photos/Room2.jpg" alt="Room 102">
+        <div class="room-body">
+          <div class="badge">Room 102</div>
+          <h4>Deluxe AC</h4>
+          <p class="price">₹2500 / night</p>
+          <ul class="tiny">
+            <li>King bed • 2 guests</li>
+            <li>City view</li>
+          </ul>
+          <button class="btn" onclick="quickBook('Room 102 — ₹1900')">Book this</button>
+        </div>
+      </div>
+      <div class="room-card">
+        <img src="/Photos/Room2.jpg" alt="Room 103">
+        <div class="room-body">
+          <div class="badge">Room 103</div>
+          <h4>Super Deluxe</h4>
+          <p class="price">₹3000</p>
+          <ul class="tiny">
+            <li>King bed • 3 guests</li>
+            <li>Balcony • Extra space</li>
+          </ul>
+          <button class="btn" onclick="quickBook('Room 103 — ₹3000')">Book this</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Amenities -->
+  <div class="panel" id="panel-amenities" hidden>
+    <div class="card">
+      <h3>Amenities</h3>
+      <div class="amen-list">
+        <div class="amen"><span>🛏</span><div><strong>Comfortable Rooms</strong><div class="tiny">AC/Non-AC, daily housekeeping</div></div></div>
+        <div class="amen"><span>📶</span><div><strong>Free Wi-Fi</strong><div class="tiny">High-speed internet</div></div></div>
+        <div class="amen"><span>🅿</span><div><strong>Parking</strong><div class="tiny">On-site parking space</div></div></div>
+        <div class="amen"><span>🧼</span><div><strong>Hygiene First</strong><div class="tiny">Clean linens & sanitized rooms</div></div></div>
+        <div class="amen"><span>🕑</span><div><strong>24x7 Front Desk</strong><div class="tiny">Check-in assistance anytime</div></div></div>
+      </div>
+    </div>
+  </div>
+
+   <!-- Location -->
+  <div class="panel" id="panel-location" hidden>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Find us</h3>
+        <p>OM SAI HOTEL, Near City Center, Shirdi, Maharashtra, India</p>
+        <iframe class="map"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=74.458%2C19.75%2C74.505%2C19.80&layer=mapnik&marker=19.77%2C74.48"
+          loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Map"></iframe>
+      </div>
+      <aside class="side">
+        <div class="card">
+          <h3>Need help?</h3>
+          <p><strong>Call:</strong> <a href="tel:9225533284">9225533284</a></p>
+          <p><strong>Email:</strong> <a href="mailto:bhaktishinde203@gmail.com">bhaktishinde203@gmail.com</a></p>
+          <button class="btn btn-primary" onclick="document.getElementById('booking').scrollIntoView({behavior:'smooth'})">Book a Room</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+</section>
+
+<footer>
+  <div class="foot-inner">
+    <div>© <span id="yr"></span> OM SAI HOTEL</div>
+    <div class="tiny">Demo website inspired by travel portals. Replace photos/text with your own.</div>
+  </div>
+</footer>
+
+<script>
+  // Year
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // Simple tabs
+  const tabs = document.querySelectorAll('.tab');
+  const panels = {
+    overview: document.getElementById('panel-overview'),
+    rooms: document.getElementById('panel-rooms'),
+    amenities: document.getElementById('panel-amenities'),
+    reviews: document.getElementById('panel-reviews'),
+    location: document.getElementById('panel-location'),
+  };
+  tabs.forEach(t=>{
+    t.addEventListener('click', ()=>{
+      tabs.forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      Object.values(panels).forEach(p=>p.hidden=true);
+      const id = t.dataset.tab;
+      panels[id].hidden=false;
+      // smooth scroll to tabs top
+      document.querySelector('.tabs').scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  // Hero slideshow + thumbnails
+  const heroImg = document.getElementById('heroImg');
+  const thumbs = Array.from(document.querySelectorAll('#thumbs img')).map(i=>i.getAttribute('data-hero'));
+  const dotsWrap = document.getElementById('dots');
+  let allSlides = [
+    "https://images.unsplash.com/photo-1551776235-dde6d4829808?q=80&w=1600&auto=format&fit=crop",
+    ...thumbs
+  ];
+  let slideIndex = 0;
+  function renderDots(){
+    dotsWrap.innerHTML = "";
+    allSlides.forEach((_,i)=>{
+      const d = document.createElement('button');
+      d.className = 'dot'+(i===slideIndex?' active':'');
+      d.addEventListener('click', ()=>{ slideIndex=i; showSlide();});
+      dotsWrap.appendChild(d);
+    });
+  }
+  function showSlide(){
+    heroImg.src = allSlides[slideIndex];
+    renderDots();
+  }
+  function nextSlide(){ slideIndex = (slideIndex+1)%allSlides.length; showSlide(); }
+  renderDots();
+  setInterval(nextSlide, 4500);
+
+  // click thumbnails to change hero
+  document.querySelectorAll('#thumbs img').forEach(img=>{
+    img.addEventListener('click', ()=>{
+      const src = img.getAttribute('data-hero');
+      const idx = allSlides.indexOf(src);
+      slideIndex = idx>=0 ? idx : 0;
+      showSlide();
+    });
+  });
+
+  // Quick book button fills booking select
+  function quickBook(value){
+    const sel = document.querySelector('#booking select[name="room"]');
+    sel.value = value;
+    document.getElementById('booking').scrollIntoView({behavior:'smooth'});
+  }
+  window.quickBook = quickBook;
+
+  // Booking form demo handler (stores to localStorage)
+  function submitBooking(e){
+    e.preventDefault();
+    const form = e.target;
+    const data = Object.fromEntries(new FormData(form).entries());
+    const records = JSON.parse(localStorage.getItem('omsai_bookings')||'[]');
+    records.push({...data, time:new Date().toISOString()});
+    localStorage.setItem('omsai_bookings', JSON.stringify(records));
+    alert("✅ Booking submitted!\n\nThank you, "+data.name+". We will contact you at "+data.phone+".");
+    form.reset();
+  }
+  window.submitBooking = submitBooking;
+</script>
+</body>
+</html>
